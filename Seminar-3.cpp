@@ -33,7 +33,7 @@ public:
     Scaun(const float pret, int anFabricare) // constructor cu 2 parametri
     {
         (*this).pret = pret; // dereferentiem pointerul this si apoi accesam membrul pret
-        this->anFabricare = anFabricare; // o forma mai scurta de accesare a membrului operatorul -> este echivalentul scrierii de mai sus
+        this->anFabricare = anFabricare; // o forma mai scurta de accesare a membrului anFabricare, operatorul -> este echivalentul scrierii de mai sus
         material = "N/A"; // nu este nevoie de this deoarece nu avem o variabila sau un parametru definite in acest constructor ca sa coincida ca si denumire cu material
         culoare = "N/A";
     }
