@@ -20,7 +20,7 @@ using namespace std;
 // 12. Sa se supraincarce operatorii == si != care verifica daca 2 obiecte de tip Floare sunt egale sau nu (ca metode)
 // 13. Sa se supraincarce operatorul de apel de functie () care va seta atributele unui obiect de tip Floare (minim 2 forme)
 
-// 14. Sa se implementeze operatorul + care aduna pretul unei flori cu o valoare primita ca parametru (functie friend)
+// 14. Sa se implementeze operatorul + care aduna pretul unei flori cu o valoare primita ca parametru (functie friend) (2 forme)
 // 14. Sa se implementeze operatorul -= care scade pretul unei flori cu o valoare primita ca parametru (functie membra) - realizat (S5)
 // 15. Sa se implementeze operatorul de cast explicit de la o Floare la un float; se foloseste pretul unei flori (functie membra)
 // 16. Sa se implementeze operatorul > care compara preturile a doua obiecte de tip Floare (functie membra) - realizat (S5)
@@ -166,9 +166,11 @@ public:
             return;
         }
 
-        delete[] this->lungimiPetale;
         this->numarPetale = numarPetale;
-        this->lungimiPetale = copiazaVector(numarPetale, lungimiPetale);
+        float* copie = copiazaVector(numarPetale, lungimiPetale);
+
+        delete[] this->lungimiPetale;
+        this->lungimiPetale = copie;
     }
 
     // float& operator[](Floare* this, const int index)
@@ -220,6 +222,122 @@ public:
     }
 
     // de aici continuam cu seminarul 6
+
+    Floare& operator++()
+    {
+        if (lungimiPetale != nullptr)
+        {
+            for (int i = 0; i < numarPetale; i++)
+            {
+                ++lungimiPetale[i];
+            }
+        }
+
+        return *this;
+    }
+
+    Floare operator++(int)
+    {
+        Floare copie = *this;
+        ++(*this);
+        return copie;
+    }
+
+    bool operator==(const Floare& f) const
+    {
+        if (this->pret != f.pret || this->numarPetale != f.numarPetale || this->denumire != f.denumire)
+        {
+            return false;
+        }
+
+        if (this->lungimiPetale == nullptr && f.lungimiPetale == nullptr)
+        {
+            return true;
+        }
+
+        if (this->lungimiPetale == nullptr || f.lungimiPetale == nullptr)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < numarPetale; i++)
+        {
+            if (this->lungimiPetale[i] != f.lungimiPetale[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool operator!=(const Floare& f) const
+    {
+        return !(*this == f);
+    }
+
+    Floare& operator()()
+    {
+        pret = 0.0f;
+        denumire = "N/A";
+
+        numarPetale = 0;
+        delete[] lungimiPetale;
+        lungimiPetale = nullptr;
+
+        return *this;
+    }
+
+    Floare& operator()(float pret, string denumire)
+    {
+        this->pret = pret;
+        this->denumire = denumire;
+
+        return *this;
+    }
+
+    friend ostream& operator<<(ostream& out, const Floare& f)
+    {
+        out << "ID-ul florii este: " << f.ID << '\n';
+        out << "Pretul florii este: " << f.pret << " euro\n";
+        out << "Denumirea florii este: " << f.denumire << '\n';
+        out << "Numarul de petale este: " << f.numarPetale << '\n';
+
+        out << "Lungimile petalelor sunt: ";
+
+        if (f.lungimiPetale == nullptr || f.numarPetale <= 0)
+        {
+            out << "Inexistente\n";
+        }
+        else
+        {
+            for (int i = 0; i < f.numarPetale; i++)
+            {
+                out << f.lungimiPetale[i] << " ";
+            }
+        }
+
+        out << "\n\n";
+
+        return out;
+    }
+
+    friend Floare operator+(const Floare& f, int x)
+    {
+        Floare copie = f;
+        copie.pret = copie.pret + x;
+        return copie;
+    }
+
+    friend Floare operator+(int x, const Floare& f)
+    {
+        return f + x;
+    }
+
+    explicit operator float() const
+    {
+        return pret + 0.21 * pret; // returnam pretul cu TVA cu tot
+    }
 
     /*
     * Destructorul clasei Floare
@@ -317,6 +435,106 @@ int main()
     // Testarea operatorului <
     cout << "f1 < f2: " << (f1 < f2) << '\n';
     // f1.operator<(f2);
+
+    // =========================================================
+    // Testarea operatorului de afisare <<
+    // =========================================================
+
+    cout << "\n========== OPERATOR << ==========\n";
+    cout << "Starea initiala a obiectului f1:\n";
+    cout << f1; // operator<<(cout, f1);
+
+    // =========================================================
+    // Testarea operatorului ++ (prefixat si postfixat)
+    // =========================================================
+
+    cout << "\n========== OPERATOR ++ ==========\n";
+
+    ++f1; // f1.operator++();
+
+    cout << "f1 dupa incrementarea prefixata (++f1):\n";
+    cout << f1;
+
+    Floare copieInainte = f1++; // f1.operator++(0);
+
+    cout << "Valoarea returnata de incrementarea postfixata:\n";
+    cout << copieInainte;
+
+    cout << "f1 dupa incrementarea postfixata (f1++):\n";
+    cout << f1;
+
+    // =========================================================
+    // Testarea operatorilor == si !=
+    // =========================================================
+
+    cout << "\n========== OPERATORII == SI != ==========\n";
+
+    Floare f5(f1);
+
+    cout << "f1 == f5: " << (f1 == f5) << '\n'; // f1.operator==(f5);
+    cout << "f1 != f5: " << (f1 != f5) << '\n'; // f1.operator!=(f5);
+
+    cout << "f1 == f2: " << (f1 == f2) << '\n';
+    cout << "f1 != f2: " << (f1 != f2) << '\n';
+
+    f5.setPret(200.0f);
+
+    cout << "Dupa modificarea pretului lui f5:\n";
+    cout << "f1 == f5: " << (f1 == f5) << '\n';
+    cout << "f1 != f5: " << (f1 != f5) << '\n';
+
+    // =========================================================
+    // Testarea operatorului () - fara parametri
+    // =========================================================
+
+    cout << "\n========== OPERATOR () FARA PARAMETRI ==========\n";
+
+    f1(); // f1.operator()();
+
+    cout << "f1 dupa resetarea atributelor:\n";
+    cout << f1;
+
+    // =========================================================
+    // Testarea operatorului () - cu doi parametri
+    // =========================================================
+
+    cout << "\n========== OPERATOR () CU PARAMETRI ==========\n";
+
+    f1(100.0f, "Trandafir japonez");
+    // f1.operator()(100.0f, "Trandafir japonez");
+
+    cout << "f1 dupa modificarea pretului si denumirii:\n";
+    cout << f1;
+
+    // =========================================================
+    // Testarea operatorului + (Floare + int si int + Floare)
+    // =========================================================
+
+    cout << "\n========== OPERATOR + ==========\n";
+
+    Floare f6 = f1 + 5; // operator+(f1, 5);
+    Floare f7 = 5 + f1; // operator+(5, f1);
+
+    cout << "Obiectul original f1:\n";
+    cout << f1;
+
+    cout << "Rezultatul operatiei f1 + 5:\n";
+    cout << f6;
+
+    cout << "Rezultatul operatiei 5 + f1:\n";
+    cout << f7;
+
+    // =========================================================
+    // Testarea operatorului de cast explicit la float
+    // =========================================================
+
+    cout << "\n========== OPERATOR CAST EXPLICIT ==========\n";
+
+    float pretCuTVA = (float)f1;
+    // float pretCuTVA = f1.operator float();
+
+    cout << "Pretul initial al florii: " << f1.getPret() << '\n';
+    cout << "Pretul florii cu TVA: " << pretCuTVA << '\n';
 
     return 0;
 }
