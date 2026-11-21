@@ -1,7 +1,7 @@
 
 # Exerciții suplimentare – Moștenirea în C++
 
-- **Materia:** Programare Orientată pe Obiecte (POO)
+- **Materia:** Programare Orientată Obiect (POO)
 - **Seminar:** Seminarul 8 · Moștenirea în C++
 - **Punctaj:** Exerciții suplimentare, fără punctaj
 
